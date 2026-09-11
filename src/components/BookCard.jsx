@@ -9,7 +9,7 @@ export default function BookCard({ book: { id, title, author, available }, onRes
         {available ? "Disponível" : "Reservado"}
       </span>
       <button onClick={() => onReserve(id)}>
-        Reservar
+        {available ? "Reservar" : "Devolver"}
       </button>
     </article>
   );
