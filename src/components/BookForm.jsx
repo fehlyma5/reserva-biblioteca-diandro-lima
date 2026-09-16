@@ -1,13 +1,18 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { BooksContext } from "../context/BooksContext";
+import { useNavigate } from "react-router";
 
-export default function BookForm({ onAddBook }) {
-  const [formData, setFormData] = useState({ title: "", author: "" });
+export default function BookForm() {
+  const { handleAddBook } = useContext(BooksContext);
+  const navigate = useNavigate(); 
+  
+  const [form, setForm] = useState({ title: "", author: "", year: "" });
   const [error, setError] = useState("");
 
   function handleChange(event) {
     const { name, value } = event.target;
-    setFormData((prev) => ({
-      ...prev,
+    setForm((currentForm) => ({
+      ...currentForm,
       [name]: value,
     }));
   }
@@ -15,49 +20,69 @@ export default function BookForm({ onAddBook }) {
   function handleSubmit(event) {
     event.preventDefault();
 
-    if (!formData.title.trim() || !formData.author.trim()) {
-      setError("Preencha o título e o autor.");
+    const title = form.title.trim();
+    const author = form.author.trim();
+    const year = form.year.trim();
+
+    if (!title || !author || !year) {
+      setError("Preencha o título, o autor e o ano.");
       return;
     }
 
-    const newBook = {
+    handleAddBook({
       id: crypto.randomUUID(),
-      title: formData.title,
-      author: formData.author,
+      title,
+      author,
+      year: Number(year),
       available: true,
-    };
+    });
 
-    onAddBook(newBook);
-    setFormData({ title: "", author: "" });
+    setForm({ title: "", author: "", year: "" });
     setError("");
+    
+    // Redirecionamento programático para a rota raiz após o cadastro
+    navigate("/"); 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="book-form">
-      {error && <p className="error-message">{error}</p>}
-
-      <div className="form-group">
-        <label htmlFor="title">Título</label>
+    <form className="book-form" onSubmit={handleSubmit}>
+      <div className="field">
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <label htmlFor="title">Título</label>
+          <span style={{ fontSize: '12px', color: '#55617a' }}>
+            {form.title.length} caracteres
+          </span>
+        </div>
         <input
-          type="text"
           id="title"
           name="title"
-          value={formData.title}
+          value={form.title}
           onChange={handleChange}
         />
       </div>
 
-      <div className="form-group">
+      <div className="field">
         <label htmlFor="author">Autor</label>
         <input
-          type="text"
           id="author"
           name="author"
-          value={formData.author}
+          value={form.author}
           onChange={handleChange}
         />
       </div>
 
+      <div className="field">
+        <label htmlFor="year">Ano de publicação</label>
+        <input
+          id="year"
+          name="year"
+          type="number"
+          value={form.year}
+          onChange={handleChange}
+        />
+      </div>
+
+      {error && <p className="form-error">{error}</p>}
       <button type="submit">Cadastrar livro</button>
     </form>
   );
