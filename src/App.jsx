@@ -1,4 +1,4 @@
-import { NavLink, Route, Routes } from "react-router";
+import { NavLink, Route, Routes } from "react-router-dom";
 import "./App.css";
 import AcervoPage from "./pages/AcervoPage";
 import NovoLivroPage from "./pages/NovoLivroPage";
